@@ -5,37 +5,37 @@ description: 指定したブランチを現在のブランチ（または指定�
 
 # Skill: git-merge
 
-## 引数
+## Arguments
 
-- `git-merge <source>` → `<source>` を**現在のブランチ**に merge する。
-- `git-merge <source> into <target>` → まず `<target>` に `switch` し、そのうえで `<source>` を merge する。
+- `git-merge <source>` → merge `<source>` into the **current branch**.
+- `git-merge <source> into <target>` → first `switch` to `<target>`, then merge `<source>` into it.
 
-`<source>` の解釈は git-rebase と同様:
+`<source>` is interpreted the same way as in git-rebase:
 
-- `main` のようなローカルブランチ名 → そのままローカルの `<source>` を使う。
-- `origin/main` のようなリモート追跡ブランチ名 → fetch 済みである前提でそのまま使う。**このスキル自身は `git fetch` を実行しない**。古い可能性がある場合は一言警告する。
+- A local branch name like `main` → used as-is.
+- A remote-tracking branch name like `origin/main` → assumed already fetched; used as-is. **This skill never runs `git fetch` itself.** Warn once if it may be stale.
 
-## 前提条件（実行前に必ず確認）
+## Preconditions (always check before running)
 
-- `git status` で作業ツリーがクリーンであることを確認する。未コミット/未ステージの変更がある場合は merge を開始せず、commit か stash をユーザーに促す。
-- `into <target>` 指定がある場合、`switch` 前にも同様にクリーンであることを確認する（switch 自体が変更を破棄しうるため）。
+- Run `git status` and confirm the working tree is clean. If there are uncommitted/unstaged changes, do not start the merge — ask the user to commit or stash.
+- If `into <target>` is given, check cleanliness again before switching (switching itself can discard changes).
 
-## 手順
+## Steps
 
-1. （`into <target>` 指定があれば）`git switch <target>` を実行する。
-2. `<source>` が `origin/...` のようなリモート追跡ブランチ名の場合、fetch はせず、ローカルの当該ref が古い可能性がある旨を実行前に一言警告する。
-3. `git merge <source>` を実行する。
-4. 結果を判定する。
-   - Fast-forward もしくは自動 merge 成功: `git log --oneline -5` で確認して報告し、終了。
-   - コンフリクト発生: git-resolve-conflicts を実行し、解決後に merge commit を作成するところまで完了させる。
-5. 完了後、`git status --short` で最終状態を確認する。
+1. If `into <target>` was given, run `git switch <target>`.
+2. If `<source>` is a remote-tracking branch like `origin/...`, do not fetch — warn once beforehand that the local ref may be stale.
+3. Run `git merge <source>`.
+4. Evaluate the result.
+   - Fast-forward or automatic merge succeeds: confirm with `git log --oneline -5`, report, and finish.
+   - Conflict: run git-resolve-conflicts, and see it through to creating the merge commit.
+5. After completion, check the final state with `git status --short`.
 
-## 禁止事項
+## Rules (never violate)
 
-- `git merge --abort` をユーザーの明示的指示なく実行すること。
-- merge commit のメッセージを勝手に書き換えること（デフォルトメッセージを尊重する。ユーザーが明示的に指定した場合のみ変更）。
+- Running `git merge --abort` without the user's explicit instruction.
+- Rewriting the merge commit message on your own (respect the default message; only change it if the user explicitly asks).
 
-## 出力
+## Output
 
-- 実行前に「何をどのブランチに merge するか」（switch の有無含む）を一言明示する。
-- 完了後、コミットグラフの要約と、push が必要な場合は force push が不要な通常 push で足りる旨（merge は通常 rebase と異なり force push 不要）を報告する。
+- Before merging, state in one line what is being merged into which branch (including whether a switch happens).
+- After completion, summarize the commit graph, and note that a normal push (not force push) is sufficient if a push is needed (unlike rebase, merge doesn't require force push).
