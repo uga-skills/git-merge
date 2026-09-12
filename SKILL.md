@@ -22,11 +22,12 @@ description: 指定したブランチを現在のブランチ（または指定�
 ## 手順
 
 1. （`into <target>` 指定があれば）`git switch <target>` を実行する。
-2. `git merge <source>` を実行する。
-3. 結果を判定する。
+2. `<source>` が `origin/...` のようなリモート追跡ブランチ名の場合、fetch はせず、ローカルの当該ref が古い可能性がある旨を実行前に一言警告する。
+3. `git merge <source>` を実行する。
+4. 結果を判定する。
    - Fast-forward もしくは自動 merge 成功: `git log --oneline -5` で確認して報告し、終了。
    - コンフリクト発生: git-resolve-conflicts を実行し、解決後に merge commit を作成するところまで完了させる。
-4. 完了後、`git status --short` で最終状態を確認する。
+5. 完了後、`git status --short` で最終状態を確認する。
 
 ## 禁止事項
 
