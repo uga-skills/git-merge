@@ -1,5 +1,6 @@
 ---
-description: 指定したブランチを現在のブランチ（または指定した別ブランチ）に merge する。競合時は git-resolve-conflicts に委譲する
+name: git-merge
+description: 指定したブランチを現在のブランチ（または指定した別ブランチ）に merge する。競合時は git-resolve-conflicts に委譲する。ユーザーが「mergeして」「このブランチに取り込んで」「mainを反映して」など、ブランチの merge を求めている場合は必ずこのスキルを使う。
 ---
 
 # Skill: git-merge
